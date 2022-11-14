@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
@@ -7,12 +7,19 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
 import { NavLink } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Table } from "react-bootstrap";
+import { DLT } from "../redux/actions/Action";
 
 export const Header = () => {
+
+  const [price,setPrice] = useState(0);
+    // console.log(price);
+
   const getdata = useSelector((state) => state.cartsreducer.carts);
-  console.log(getdata);
+  // console.log(getdata);
+
+  const dispatch =useDispatch();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -22,6 +29,23 @@ export const Header = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const dlt =(id)=>{
+    dispatch(DLT(id))
+  }
+
+
+
+  const total =()=>{
+    let price = 0;
+    getdata.map((ele,k)=>{
+      price = ele.price * ele.qnty+price
+    })
+    setPrice(price);
+  }
+  useEffect(()=>{
+    total()
+  },[total])
 
   return (
     <>
@@ -88,14 +112,15 @@ export const Header = () => {
                           </td>
                           <td>
                             <p>{e.rname}</p>
-                            <p>Price :₹ {e.price}</p>
-                            <p>Quantity :₹ {e.qnty}</p>
+                            <p>Price :₹ {e.price * e.qnty  }</p>
+                            <p>Quantity : {e.qnty }</p>
                             <p
                               style={{
                                 color: "red",
                                 fontSize: 20,
                                 cursor: "pointer",
                               }}
+                              onClick={()=>dlt(e.id)}
                             >
                               <i className="fas fa-trash smalltrash"> </i>
                             </p>
@@ -107,6 +132,7 @@ export const Header = () => {
                               fontSize: 20,
                               cursor: "pointer",
                             }}
+                            onClick={()=>dlt(e.id)}
                           >
                             <i className="fas fa-trash largetrash"> </i>
                           </td>
@@ -114,7 +140,7 @@ export const Header = () => {
                       </>
                     );
                   })}
-                  <p className="text-center">Total :₹ 300</p>
+                  <p className="text-center">Total :₹ {price}</p>
                 </tbody>
               </Table>
             </div>
